@@ -20,19 +20,12 @@ export async function getDashboardStats(): Promise<DashboardStatsResult> {
 
     if (tests.length === 0) {
       return {
-        bestWpm: 48,
-        bestAccuracy: 98,
-        totalTests: 24,
-        totalPracticeSeconds: 1800,
-        streakDays: 5,
-        history: [
-          { test: 'Test 1', wpm: 18, accuracy: 88 },
-          { test: 'Test 2', wpm: 24, accuracy: 92 },
-          { test: 'Test 3', wpm: 29, accuracy: 95 },
-          { test: 'Test 4', wpm: 35, accuracy: 94 },
-          { test: 'Test 5', wpm: 42, accuracy: 98 },
-          { test: 'Test 6', wpm: 48, accuracy: 97 },
-        ],
+        bestWpm: 0,
+        bestAccuracy: 0,
+        totalTests: 0,
+        totalPracticeSeconds: 0,
+        streakDays: 0,
+        history: [],
       };
     }
 
@@ -56,20 +49,14 @@ export async function getDashboardStats(): Promise<DashboardStatsResult> {
       history,
     };
   } catch (error) {
+    console.error('Error fetching dashboard stats from DB:', error);
     return {
-      bestWpm: 48,
-      bestAccuracy: 98,
-      totalTests: 24,
-      totalPracticeSeconds: 1800,
-      streakDays: 5,
-      history: [
-        { test: 'Test 1', wpm: 18, accuracy: 88 },
-        { test: 'Test 2', wpm: 24, accuracy: 92 },
-        { test: 'Test 3', wpm: 29, accuracy: 95 },
-        { test: 'Test 4', wpm: 35, accuracy: 94 },
-        { test: 'Test 5', wpm: 42, accuracy: 98 },
-        { test: 'Test 6', wpm: 48, accuracy: 97 },
-      ],
+      bestWpm: 0,
+      bestAccuracy: 0,
+      totalTests: 0,
+      totalPracticeSeconds: 0,
+      streakDays: 0,
+      history: [],
     };
   }
 }
