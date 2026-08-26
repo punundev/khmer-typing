@@ -14,6 +14,7 @@ export interface TypingState {
   timeLimit: number; // 15, 30, 60, 120
   wordLimit: number; // 10, 25, 50, 100
   customText: string;
+  autoTransliterate: boolean;
 
   // Session State
   targetText: string;
@@ -35,6 +36,7 @@ export interface TypingState {
   setTimeLimit: (seconds: number) => void;
   setWordLimit: (words: number) => void;
   setCustomText: (text: string) => void;
+  setAutoTransliterate: (enabled: boolean) => void;
   setSoundEnabled: (enabled: boolean) => void;
   initSession: (textOverride?: string) => void;
   handleKeyPress: (key: string) => void;
@@ -69,6 +71,7 @@ export const useTypingStore = create<TypingState>((set, get) => ({
   timeLimit: 30,
   wordLimit: 25,
   customText: '',
+  autoTransliterate: true,
 
   targetText: '',
   targetGraphemes: [],
@@ -124,6 +127,7 @@ export const useTypingStore = create<TypingState>((set, get) => ({
     }
   },
 
+  setAutoTransliterate: (enabled) => set({ autoTransliterate: enabled }),
   setSoundEnabled: (enabled) => set({ soundEnabled: enabled }),
 
   initSession: (textOverride) => {

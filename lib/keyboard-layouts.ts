@@ -147,7 +147,7 @@ export const KHMER_NIDA_LAYOUT: KeyboardLayout = {
       { code: 'KeyN', label: 'ន', shiftLabel: 'ណ' },
       { code: 'KeyM', label: 'ម', shiftLabel: 'ំ' },
       { code: 'Comma', label: 'ឡ', shiftLabel: '៖' },
-      { code: 'Period', label: '<ctrl42>', shiftLabel: '៹' },
+      { code: 'Period', label: '៕', shiftLabel: '៹' },
       { code: 'Slash', label: '៊', shiftLabel: '?' },
       { code: 'ShiftRight', label: 'Shift', width: 'w-24', isSpecial: true },
     ],
@@ -156,3 +156,16 @@ export const KHMER_NIDA_LAYOUT: KeyboardLayout = {
     ],
   ],
 };
+
+export function getKhmerCharForCode(code: string, isShift: boolean = false): string | null {
+  for (const row of KHMER_NIDA_LAYOUT.rows) {
+    for (const key of row) {
+      if (key.code === code && !key.isSpecial) {
+        if (isShift && key.shiftLabel) return key.shiftLabel;
+        if (key.label === '្ (ជើង)') return '្';
+        return key.label;
+      }
+    }
+  }
+  return null;
+}

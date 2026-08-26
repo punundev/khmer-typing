@@ -6,8 +6,9 @@ import { TypingSettings } from './typing-settings';
 import { TypingText } from './typing-text';
 import { TypingStatsHUD } from './typing-stats';
 import { VirtualKeyboard } from '../keyboard/virtual-keyboard';
-import { segmentGraphemes, normalizeUnicode } from '@/lib/unicode';
-import { RefreshCw, Play } from 'lucide-react';
+import { segmentGraphemes, normalizeUnicode, isKhmerGrapheme } from '@/lib/unicode';
+import { getKhmerCharForCode } from '@/lib/keyboard-layouts';
+import { RefreshCw, Play, Sparkles } from 'lucide-react';
 
 export function TypingEngine() {
   const {
@@ -19,6 +20,10 @@ export function TypingEngine() {
     initSession,
     resetSession,
     soundEnabled,
+    targetGraphemes,
+    currentIndex,
+    language,
+    autoTransliterate,
   } = useTypingStore();
 
   const [activeKey, setActiveKey] = React.useState<string | null>(null);
@@ -63,7 +68,7 @@ export function TypingEngine() {
     }
   }, [soundEnabled]);
 
-  // Keydown handler
+  // Keydown handler with Smart Auto-Detection
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     setActiveKey(e.code);
     setTimeout(() => setActiveKey(null), 150);
@@ -80,9 +85,26 @@ export function TypingEngine() {
       resetSession();
       return;
     }
+
+    const currentTarget = targetGraphemes[currentIndex] || '';
+    const isTargetKhmer = isKhmerGrapheme(currentTarget) || language === 'km';
+
+    // Smart Auto-Detect: If current target is Khmer & input key is QWERTY English, map to Khmer NiDA
+    if (autoTransliterate && isTargetKhmer && /^Key|^Digit|^Minus|^Equal|^Bracket|^Semicolon|^Quote|^Comma|^Period|^Slash/.test(e.code)) {
+      // If user typed a real Khmer char from OS keyboard, let onChange handle it
+      if (isKhmerGrapheme(e.key)) return;
+
+      const khmerMappedChar = getKhmerCharForCode(e.code, e.shiftKey);
+      if (khmerMappedChar) {
+        e.preventDefault();
+        handleKeyPress(khmerMappedChar);
+        playClickSound();
+        return;
+      }
+    }
   };
 
-  // Input change handler for complex IME / Khmer compositing
+  // Input change handler for native Khmer OS IME / compositing
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value;
     if (!val) return;
@@ -122,6 +144,14 @@ export function TypingEngine() {
 
       {/* Settings Toolbar */}
       <TypingSettings />
+
+      {/* Auto-Detect Khmer Layout Badge */}
+      <div className="flex items-center justify-between text-xs text-muted-foreground px-2">
+        <div className="flex items-center gap-1.5 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 px-3 py-1 rounded-full font-khmer font-semibold">
+          <Sparkles className="w-3.5 h-3.5" />
+          <span>Smart Keyboard Auto-Detect: អាចវាយបានទាំង English Keyboard & Khmer Keyboard</span>
+        </div>
+      </div>
 
       {/* Typing Text Box */}
       <div className="relative group">
